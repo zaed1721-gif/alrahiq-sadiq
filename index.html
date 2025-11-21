@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>الرحيق الصادق - مكتبة الأحاديث الشيعية</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { 
+            box-sizing: border-box; 
+            margin: 0; 
+            padding: 0; 
+        }
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #2c3e50; 
+            line-height: 1.8; 
+            text-align: right; 
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .header { 
+            background: rgba(255, 255, 255, 0.95);
+            color: #2c5aa0; 
+            padding: 2.5rem 2rem; 
+            margin-bottom: 2rem;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            border-radius: 15px;
+        }
+
+        .header h1 {
+            font-size: 2.8rem;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, #2c5aa0, #8e44ad);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header .subtitle {
+            font-size: 1.3rem;
+            color: #7f8c8d;
+            margin-bottom: 0.5rem;
+        }
+
+        .header .quote {
+            font-style: italic;
+            color: #e74c3c;
+            font-size: 1.1rem;
+            margin-top: 1rem;
+        }
+
+        .search-container {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+
+        #searchInput {
+            width: 100%;
+            padding: 18px 20px;
+            font-size: 1.2rem;
+            border: 2px solid #ddd;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        #searchInput:focus {
+            border-color: #2c5aa0;
+            box-shadow: 0 0 0 3px rgba(44, 90, 160, 0.1);
+            outline: none;
+        }
+
+        .search-stats {
+            color: #7f8c8d;
+            text-align: center;
+            font-size: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .hadith-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            border-right: 5px solid #2c5aa0;
+            transition: transform 0.3s ease;
+        }
+
+        .hadith-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .hadith-text {
+            font-size: 1.3rem;
+            margin-bottom: 1.5rem;
+            line-height: 1.9;
+            color: #2c3e50;
+        }
+
+        .hadith-source {
+            color: #7f8c8d;
+            font-style: italic;
+            border-top: 1px dashed #ecf0f1;
+            padding-top: 1rem;
+            font-size: 1rem;
+        }
+
+        .copy-btn {
+            background: linear-gradient(135deg, #27ae60, #2ecc71);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-left: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .copy-btn:hover {
+            background: linear-gradient(135deg, #219653, #27ae60);
+            transform: scale(1.05);
+        }
+
+        mark {
+            background-color: #ffeaa7;
+            padding: 2px 5px;
+            border-radius: 3px;
+        }
+
+        .footer {
+            text-align: center;
+            color: white;
+            margin-top: 3rem;
+            padding: 1.5rem;
+            font-size: 1rem;
+        }
+.loading {
+            text-align: center;
+            color: white;
+            font-size: 1.2rem;
+            padding: 2rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-book-open"></i> الرحيق الصادق</h1>
+            <div class="subtitle">مكتبة الأحاديث الشيعية - منبر علوم الإمام جعفر الصادق (ع)</div>
+            <div class="quote">"العلم نهر لا ينضب، والعاقل من اغترف منه"</div>
+        </div>
+
+        <div class="search-container">
+            <input type="text" id="searchInput" placeholder="🔍 اكتب كلمة أو جملة من الحديث للبحث...">
+            <div class="search-stats" id="searchStats">اكتب للبدء في البحث</div>
+        </div>
+
+        <div id="results">
+            <div class="loading">
+                <i class="fas fa-spinner fa-spin"></i> جاري تحميل الأحاديث...
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>© 2024 الرحيق الصادق - جميع الحقوق محفوظة</p>
+            <p>نفخر بتقديم علوم أهل البيت (عليهم السلام) لطلاب المعرفة</p>
+        </div>
+    </div>
+
+    <script>
+        // قاعدة بيانات الأحاديث - يمكننا زيادتها لاحقاً
+        const hadiths = [
+            {
+                id: 1,
+                text: "إنما الأعمال بالنيات، وإنما لكل امرئ ما نوى.",
+                source: "الكافي - الشيخ الكليني - ج ٢ - الصفحة ٨٤"
+            },
+            {
+                id: 2,
+                text: "من أصبح لا يهتم بأمور المسلمين فليس بمسلم.",
+                source: "وسائل الشيعة - الحر العاملي - ج ١٢ - الصفحة ٢١٣"
+            },
+            {
+                id: 3,
+                text: "كونوا دعاة للناس بغير ألسنتكم، ليروا منكم الاجتهاد والصدق والورع.",
+                source: "تحف العقول - ابن شعبة الحراني - الصفحة ٤٨٧"
+            },
+            {
+                id: 4,
+                text: "الكلام اللين يثمر المودة، والبذلة تثمر المودة، والبر يثمر المودة.",
+                source: "مستدرك الوسائل - الميرزا النوري - ج ٨ - الصفحة ٤٢٤"
+            },
+            {
+                id: 5,
+                text: "طلب العلم فريضة على كل مسلم ومسلمة.",
+                source: "بحار الأنوار - المجلسي - ج ١ - الصفحة ١٧٧"
+            },
+            {
+                id: 6,
+                text: "النظر إلى العالم عبادة.",
+                source: "مستدرك الوسائل - الميرزا النوري - ج ١٧ - الصفحة ٣١٥"
+            },
+            {
+                id: 7,
+                text: "خيركم من تعلم القرآن وعلمه.",
+                source: "الكافي - الشيخ الكليني - ج ٢ - الصفحة ٨٧"
+            },
+            {
+                id: 8,
+                text: "صاحب النعمة يجب أن يجريها على أهلها.",
+                source: "تحف العقول - ابن شعبة الحراني - الصفحة ٣٣٦"
+            },
+            {
+                id: 9,
+                text: "ما عُبد الله بشيء أفضل من العقل.",
+                source: "الكافي - الشيخ الكليني - ج ١ - الصفحة ١١"
+            },
+            {
+                id: 10,
+                text: "من وعظ أخاه سراً فقد زانه، ومن وعظه علانية فقد شانه.",
+                source: "وسائل الشيعة - الحر العاملي - ج ٨ - الصفحة ٤١٣"
+            }
+        ];
+
+        const searchInput = document.getElementById('searchInput');
+        const resultsDiv = document.getElementById('results');
+        const searchStats = document.getElementById('searchStats');
+
+        // دالة البحث الرئيسية
+        function searchHadiths() {
+            const searchTerm = searchInput.value.trim().toLowerCase();
+            
+            if (searchTerm.length === 0) {
+                displayResults(hadiths, '');
+                return;
+            }
+            
+            if (searchTerm.length < 2) {
+                searchStats.innerHTML = 'اكتب على الأقل حرفين للبحث';
+                return;
+            }
+
+            const filteredHadiths = hadiths.filter(hadith =>
+                hadith.text.toLowerCase().includes(searchTerm) ||
+                hadith.source.toLowerCase().includes(searchTerm)
+            );
+
+            displayResults(filteredHadiths, searchTerm);
+        }
+// دالة عرض النتائج
+        function displayResults(results, searchTerm) {
+            if (results.length === 0 && searchTerm) {
+                resultsDiv.innerHTML = 
+                    <div class="hadith-card" style="text-align: center;">
+                        <div style="font-size: 1.5rem; color: #e74c3c; margin-bottom: 1rem;">
+                            <i class="fas fa-search"></i>
+                        </div>
+                        <div style="font-size: 1.2rem; color: #7f8c8d;">
+                            لم نعثر على أحاديث تحتوي على: "<strong>${searchTerm}</strong>"
+                        </div>
+                        <div style="margin-top: 1rem; color: #95a5a6;">
+                            جرب كلمات أخرى أو راجع الكتابة
+                        </div>
+                    </div>
+                ;
+                searchStats.innerHTML = لا توجد نتائج للبحث عن: "${searchTerm}";
+                return;
+            }
+
+            if (results.length === 0) {
+                resultsDiv.innerHTML = '<div class="loading"><i class="fas fa-info-circle"></i> لا توجد أحاديث لعرضها</div>';
+                searchStats.innerHTML = 'لا توجد أحاديث';
+                return;
+            }
+
+            let statsText = searchTerm ? 
+                عثرنا على ${results.length} حديث يحتوي على "${searchTerm}" :
+                عرض ${results.length} حديث من أرشيفنا;
+
+            searchStats.innerHTML = statsText;
+
+            resultsDiv.innerHTML = '';
+            
+            results.forEach(hadith => {
+                const card = document.createElement('div');
+                card.className = 'hadith-card';
+                
+                // تمييز الكلمات التي تم البحث عنها
+                let highlightedText = highlightText(hadith.text, searchTerm);
+                let highlightedSource = highlightText(hadith.source, searchTerm);
+                
+                card.innerHTML = 
+                    <div class="hadith-text">
+                        <i class="fas fa-quote-right" style="color: #2c5aa0; margin-left: 10px;"></i>
+                        ${highlightedText}
+                    </div>
+                    <div class="hadith-source">
+                        <i class="fas fa-book" style="color: #7f8c8d; margin-left: 8px;"></i>
+                        المصدر: ${highlightedSource}
+                    </div>
+                    <button class="copy-btn" onclick="copyToClipboard('${hadith.text.replace(/'/g, "\\'")}')">
+                        <i class="fas fa-copy"></i> نسخ النص
+                    </button>
+                    <button class="copy-btn" onclick="copyToClipboard('${hadith.source.replace(/'/g, "\\'")}')">
+                        <i class="fas fa-copy"></i> نسخ المصدر
+                    </button>
+                ;
+                
+                resultsDiv.appendChild(card);
+            });
+        }
+
+        // دالة تمييز النص
+        function highlightText(text, searchTerm) {
+            if (!searchTerm) return text;
+            
+            const regex = new RegExp((${searchTerm}), 'gi');
+            return text.replace(regex, '<mark>$1</mark>');
+        }
+
+        // دالة نسخ النص
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                // رسالة نجاح بسيطة
+                const originalText = searchStats.textContent;
+                searchStats.innerHTML = <span style="color: #27ae60;"><i class="fas fa-check"></i> تم نسخ النص بنجاح!</span>;
+                
+                setTimeout(() => {
+                    searchStats.textContent = originalText;
+                }, 2000);
+            }).catch(err => {
+                searchStats.innerHTML = <span style="color: #e74c3c;"><i class="fas fa-times"></i> فشل في النسخ</span>;
+            });
+        }
+// البحث أثناء الكتابة
+        searchInput.addEventListener('input', searchHadiths);
+        
+        // عرض جميع الأحاديث عند تحميل الصفحة
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                displayResults(hadiths, '');
+            }, 1000);
+        });
+    </script>
+</body>
+</html>
